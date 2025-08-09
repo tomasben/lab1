@@ -126,8 +126,41 @@ def get_active_apps() -> Union[list[tuple[str, str, datetime]], None]:
         return None
 
 
-# def get_apps_notif_average() -> list[tuple[str, float]]:
-#     notifications_overview = []
+def get_app_notif_average(requested_app: str) -> Union[float, None]:
+    notifications_count = 0
+    month_count = 0
+
+    if os.path.exists(HISTORY_FOLDER_NAME):
+        history_files = os.listdir(HISTORY_FOLDER_NAME)
+
+        for file in history_files:
+            direccion = os.path.join(HISTORY_FOLDER_NAME, file)
+            month_count += 1
+
+            with open(direccion, "r+") as file:
+                for line in file:
+                    if line.strip().startswith("#"):
+                        continue
+                    else:
+                        file_app_name, file_notif_count, file_open_count = line.split(
+                            ","
+                        )
+
+                        if file_app_name == requested_app:
+                            notifications_count += int(file_notif_count)
+
+    if os.path.exists(DATA_FILE_NAME + ".txt"):
+        with open(DATA_FILE_NAME + ".txt", "r+") as file:
+            for line in file:
+                if line.strip().startswith("#"):
+                    continue
+                else:
+                    file_app_name, file_notif_count, file_open_count = line.split(",")
+
+                    if file_app_name == requested_app:
+                        notifications_count += int(file_notif_count)
+
+    return notifications_count / month_count
 
 
 def silence_app(requested_app: str):
@@ -267,7 +300,3 @@ def create_file(file_name: str, path: str | None = None):
         if file_name == DATA_FILE_NAME:
             current_month = datetime.now().strftime("%B")
             file.write(f"# {current_month.capitalize()}\n")
-
-
-if __name__ == "__main__":
-    print("no function assigned")

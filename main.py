@@ -14,7 +14,8 @@ def main():
 
     while True:
         cli.clear()
-        cli.draw_heading(text="NO MOLESTAPP", width=40)
+        cli.draw_heading(text="NO MOLESTAPP", width=60)
+        print_energy_saving(width=60)
 
         print(f"\n{left_margin}ACCIONES: ")
         print(f"{left_margin + '  '}[1] Ingresar una nueva entrada")
@@ -34,6 +35,28 @@ def main():
             case "4":
                 cli.clear()
                 sys.exit(0)
+
+
+def print_energy_saving(width: int):
+    NOTIF_ENERGY_CONSUMPTION = 0.25
+    active_apps_data = file.get_active_apps()
+    energy_saved = 0
+
+    if active_apps_data:
+        active_apps = [app[0] for app in active_apps_data]
+
+        for app in active_apps:
+            notif_avergage = file.get_app_notif_average(app)
+
+            if notif_avergage:
+                energy_saved += notif_avergage * NOTIF_ENERGY_CONSUMPTION
+
+    if energy_saved > 0:
+        # Estimado de porcentaje de carga relativo a una bateria de 4000mAh
+        estimate = round(energy_saved / 15400 * 100, 2)
+
+        print(f"\n{left_margin}Desde que empezaste a usar NO MOLESTAPP ahorraste:\n")
+        print(f"{left_margin}{f'⚡ {estimate}% de carga ⚡'.center(width)}\n")
 
 
 def new_entry():
